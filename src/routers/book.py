@@ -1,7 +1,7 @@
 from cmath import e
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
-from database import engine, SessionLocal
+from database import engine, get_db
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -9,14 +9,6 @@ from fastapi.encoders import jsonable_encoder
 import models
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-
-    finally:
-        db.close()
 
 class Livro(BaseModel):
     id: int | None = None
@@ -39,7 +31,7 @@ class Livro(BaseModel):
 models.Base.metadata.create_all(bind = engine)
 
 @router.get("/book/", tags = ["Book"])
-async def get_book(db: Session = Depends(get_db)):
+def get_book(db: Session = Depends(get_db)):
     all_data = db.query(models.Book).all()
     if(all_data != []):
         all_data_json = jsonable_encoder(all_data)
@@ -57,7 +49,7 @@ async def get_book(db: Session = Depends(get_db)):
         })
 
 @router.post("/book/", tags = ["Book"])
-async def post_book(data: Livro, db: Session = Depends(get_db)):
+def post_book(data: Livro, db: Session = Depends(get_db)):
     try:
         new_object = models.Book(**data.dict())
         db.add(new_object)
@@ -70,7 +62,7 @@ async def post_book(data: Livro, db: Session = Depends(get_db)):
             "message": "Dados cadastrados com sucesso",
             "error": None,
             "data": new_object_json,
-        })
+            }, headers = {"content-type": "application/json"})
     except Exception as e:
         return JSONResponse(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, content = {
             "message": "Erro ao obter dados",

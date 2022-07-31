@@ -8,7 +8,7 @@ class Book(Base):
     id = Column(Integer, primary_key=True)
     titulo = Column(String)
     autor = Column(String)
-    ano = Column(String)
+    ano = Column(Integer)
 
     def __init__(self, id, titulo, autor, ano):
         self.id = id
