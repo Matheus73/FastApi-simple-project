@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches:
+      - master
+      - main
+      - develop
+    types: [opened, synchronize, reopened]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create a docker network
+      run: docker network create simple_network
+      
+    - name: Build the Docker image
+      run: docker-compose build
+
+  
+  lint:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create a docker network
+      run: docker network create simple_network  
+      
+    - name: Build the Docker image
+      run: docker-compose build
+
+    - name: Run the docker aplication
+      run: docker-compose up -d
+    
+    - name: Run isort
+      run: docker exec -it app isort *.py --diff
+      
+    - name: Run Flake8
+      run: docker exec -it app flake8
+  
+  tests:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create a docker network
+      run: docker network create simple_network  
+      
+    - name: Build the Docker image
+      run: docker-compose build
+
+    - name: Run the docker aplication
+      run: docker-compose up -d
+    
+    - name: Run tests
+      run: docker exec -it app pytest -vv --cov
+  
