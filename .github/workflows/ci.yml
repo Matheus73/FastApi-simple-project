@@ -43,10 +43,10 @@ jobs:
       run: docker-compose up -d
     
     - name: Run isort
-      run: docker exec -it app isort *.py --diff
+      run: docker-compose run app bash -c "isort *.py --diff"
       
     - name: Run Flake8
-      run: docker exec -it app flake8
+      run: docker-compose run app bash -c "flake8"
   
   tests:
   
@@ -65,5 +65,5 @@ jobs:
       run: docker-compose up -d
     
     - name: Run tests
-      run: docker exec -it app pytest -vv --cov
+      run: docker-compose run app bash -c "pytest -vv --cov"
   
