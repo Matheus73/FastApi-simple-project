@@ -31,6 +31,6 @@ jobs:
         name: build-push-action
         uses: docker/build-push-action@v2
         with:
-          context: "{{defaultContext}}:docker"
+          context: "{{defaultContext}}"
           push: true
           tags: bigode73/fastapi-simple-project:latest
