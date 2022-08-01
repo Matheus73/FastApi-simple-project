@@ -4,10 +4,9 @@ from fastapi.testclient import TestClient
 import pytest
 import os
 import sys
-import tempfile
 
 try:
-    sys.path.append(os.getcwd()+"/src")
+    sys.path.append(os.getcwd() + "/src")
 except Exception:
     pass
 
@@ -16,9 +15,13 @@ from database import get_db
 import models
 
 engine = create_engine("sqlite:///test.db")
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine)
 
-models.Base.metadata.create_all(bind = engine)
+models.Base.metadata.create_all(bind=engine)
+
 
 @pytest.fixture(scope="session")
 def session():
@@ -30,6 +33,7 @@ def session():
         # session.close()
     yield session
     os.remove("test.db")
+
 
 @pytest.fixture(scope="function")
 def client(session) -> TestClient:
@@ -43,4 +47,3 @@ def client(session) -> TestClient:
     with TestClient(app) as client:
         app.dependency_overrides[get_db] = get_db_test
         yield client
-
